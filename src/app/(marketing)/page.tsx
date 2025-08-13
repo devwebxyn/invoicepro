@@ -1,39 +1,25 @@
-// src/app/page.tsx
-
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import Announcement from "@/components/marketing/Announcement";
 import Hero from "@/components/marketing/Hero";
-import Marquee from "@/components/marketing/Marquee";
-import Stats from "@/components/marketing/Stats";
+import Logos from "@/components/marketing/Logos";
 import Features from "@/components/marketing/Features";
-import HowItWorks from "@/components/marketing/HowItWorks";
 import ShowcaseInvoice from "@/components/marketing/ShowcaseInvoice";
-import Testimonials from "@/components/marketing/Testimonials";
 import Pricing from "@/components/marketing/Pricing";
 import FAQ from "@/components/marketing/FAQ";
 import CTA from "@/components/marketing/CTA";
-import FloatingCTA from "@/components/marketing/FloatingCTA";
 
-export default function HomePage() {
+export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-zinc-50 dark:from-zinc-950 dark:to-black">
-      <Announcement />
       <Header />
-      <div className="relative bg-grid">
-        <Hero />
-      </div>
-      <Marquee />
-      <Stats />
+      <Hero />
+      <Logos />
       <Features />
-      <HowItWorks />
       <ShowcaseInvoice />
-      <Testimonials />
       <Pricing />
       <FAQ />
       <CTA />
       <Footer />
-      <FloatingCTA />
     </div>
   );
 }
