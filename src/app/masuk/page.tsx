@@ -133,7 +133,7 @@ export default function LoginPage() {
     type="button"
     variant="outline"
     className="h-11"
-    onClick={() => (location.href = "/api/oauth/google")}
+    onClick={() => (location.href = "/api/oauth/google/start")}
     aria-label="Masuk dengan Google"
   >
     <span className="inline-flex items-center gap-2 text-sm">
@@ -145,7 +145,7 @@ export default function LoginPage() {
     type="button"
     variant="outline"
     className="h-11"
-    onClick={() => (location.href = "/api/oauth/facebook")}
+    onClick={() => (location.href = "/api/oauth/facebook/start")}
     aria-label="Masuk dengan Facebook"
   >
     <span className="inline-flex items-center gap-2 text-sm">
@@ -157,7 +157,7 @@ export default function LoginPage() {
     type="button"
     variant="outline"
     className="h-11"
-    onClick={() => (location.href = "/api/oauth/twitter")}
+    onClick={() => (location.href = "/api/oauth/twitter/start")}
     aria-label="Masuk dengan X (Twitter)"
   >
     <span className="inline-flex items-center gap-2 text-sm">

@@ -1,5 +1,8 @@
 // scripts/migrate.ts
-import { Client, Databases, Users, Storage } from "node-appwrite";
+import { config } from 'dotenv';
+config({ path: '.env.local', override: true }); // baca .env.local
+config(); // fallback ke .env jika ada
+import { Client, Databases, Users, Storage, Permission, Role } from "node-appwrite";
 
 const {
   APPWRITE_ENDPOINT,
@@ -10,15 +13,23 @@ const {
   APPWRITE_AVATAR_BUCKET_ID,
 } = process.env;
 
+
 async function main() {
-  if (!APPWRITE_ENDPOINT || !APPWRITE_PROJECT || !APPWRITE_API_KEY) {
-    throw new Error("Appwrite env incomplete");
-  }
+  const required = [
+    'APPWRITE_ENDPOINT',
+    'APPWRITE_PROJECT',
+    'APPWRITE_API_KEY',
+    'APPWRITE_DATABASE_ID',
+    'APPWRITE_USERS_COLLECTION_ID',
+    'APPWRITE_AVATAR_BUCKET_ID'
+  ];
+  const missing = required.filter(k => !process.env[k]);
+  if (missing.length) throw new Error(`Missing env: ${missing.join(', ')}`);
 
   const client = new Client()
-    .setEndpoint(APPWRITE_ENDPOINT)
-    .setProject(APPWRITE_PROJECT)
-    .setKey(APPWRITE_API_KEY);
+    .setEndpoint(APPWRITE_ENDPOINT!)
+    .setProject(APPWRITE_PROJECT!)
+    .setKey(APPWRITE_API_KEY!);
 
   const db = new Databases(client);
   const storage = new Storage(client);
@@ -68,13 +79,20 @@ async function main() {
   await addStr("provider_uid", 128, false);
 
   // 4) Indexes (unique utk username, provider_uid, user_id)
-  type IndexType = "key" | "fulltext" | "unique" | "hash" | "geo";
   const addIndex = async (key: string, fields: string[], unique = false) => {
     try {
-      const indexType: IndexType = unique ? "unique" : "key";
-      // @ts-ignore - node-appwrite types may not match actual API
-      await db.createIndex(APPWRITE_DATABASE_ID!, APPWRITE_USERS_COLLECTION_ID!, key, indexType, fields);
-      console.log("  # index", key);
+      const orders = Array(fields.length).fill('ASC');
+      // @ts-ignore
+      await db.createIndex(
+        APPWRITE_DATABASE_ID!,
+        APPWRITE_USERS_COLLECTION_ID!,
+        key,
+        'key',
+        fields,
+        orders,
+        unique ? { unique: true } : undefined
+      );
+      console.log('  # index', key);
     } catch {}
   };
   await addIndex("idx_user_id_unique", ["user_id"], true);
@@ -90,14 +108,18 @@ async function main() {
       APPWRITE_AVATAR_BUCKET_ID!,
       "Avatars",
       [
-        "role:all"
-      ], // read permission publik; ganti sesuai kebutuhan security-mu
-      false, // fileSecurity
-      undefined, // enabled
-      10 * 1024 * 1024, // maximumFileSize: 10MB
-      ["jpg", "jpeg", "png", "webp"], // allowedFileExtensions
-      undefined, // encryption
-      undefined // antivirus
+        // PUBLIC READ — tampilkan avatar tanpa login
+        Permission.read(Role.any()),
+        // Jika mau user yang login bisa upload langsung dari client:
+        // Permission.create(Role.users()),
+        // Permission.update(Role.users()),
+        // Permission.delete(Role.users()),
+      ],
+      false,                 // fileSecurity=false → permission di atas berlaku ke semua file
+      true,                  // enabled
+      10 * 1024 * 1024,      // maximumFileSize: 10MB
+      ["jpg", "jpeg", "png", "webp"] // allowedFileExtensions
+      // sisanya biarkan default (compression/encryption/antivirus)
     );
     console.log("✓ Bucket created:", APPWRITE_AVATAR_BUCKET_ID);
   }

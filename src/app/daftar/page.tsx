@@ -206,13 +206,13 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="grid grid-cols-3 gap-3">
-  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/google")}>
+  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/google/start")}>
     <span className="inline-flex items-center gap-2 text-sm"><GoogleIcon /> Google</span>
   </Button>
-  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/facebook")}>
+  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/facebook/start")}>
     <span className="inline-flex items-center gap-2 text-sm"><FacebookIcon /> Facebook</span>
   </Button>
-  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/twitter")}>
+  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/twitter/start")}>
     <span className="inline-flex items-center gap-2 text-sm"><XIcon />Twitter</span>
   </Button>
 </div>
