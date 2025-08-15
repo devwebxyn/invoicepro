@@ -7,7 +7,7 @@ import RegionLatency from "@/components/infrastructure/RegionLatency";
 import SLAStats from "@/components/infrastructure/SLAStats";
 import StackTabs from "@/components/infrastructure/StackTabs";
 import BackupMatrix from "@/components/infrastructure/BackupMatrix";
-import MonitoringGrid from "@/components/infrastructure/MonitoringGrid";
+import MonitoringMatrix from "@/components/infrastructure/MonitoringGrid";
 import PipelineSteps from "@/components/infrastructure/PipelineSteps";
 import PDFandPayment from "@/components/infrastructure/PDFandPayment";
 import ArchitectureDiagram from "@/components/infrastructure/ArchitectureDiagram";
@@ -75,7 +75,18 @@ export default function InfrastrukturPage() {
 
         <section>
           <h2 className="text-2xl md:text-3xl font-semibold mb-4">Monitoring</h2>
-          <MonitoringGrid />
+          {/* Monitoring lama, jika ada, bisa dihapus atau diganti */}
+        </section>
+
+        {/* Monitoring Matrix baru sesuai instruksi user */}
+        <section className="mx-auto max-w-6xl px-4 py-12">
+          <h2 className="text-2xl md:text-3xl font-semibold">Monitoring (Matrix)</h2>
+          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+            Panel sumber & resource realtime: CPU, memori, DB, region, queue, success rate, PDF/min, dsb.
+          </p>
+          <div className="mt-6">
+            <MonitoringMatrix />
+          </div>
         </section>
 
         <section>

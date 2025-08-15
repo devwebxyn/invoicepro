@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 const items = [
   { name: "Appwrite", role: "Database, Auth, Storage", logo: "/logos/appwrite.svg" },
   { name: "Vercel", role: "Hosting Next.js & Edge", logo: "/logos/vercel.svg" },
+  { name: "Heroku", role: "Backend service providers", logo: "/logos/heroku.svg" },
   { name: "Cloudflare", role: "DNS, CDN, WAF", logo: "/logos/cloudflare.svg" },
   { name: "Xendit", role: "Payments (QRIS/VA/eWallet/Card)", logo: "/logos/xendit.svg" },
 ];
