@@ -22,10 +22,12 @@ export async function upsertUser({ provider, provider_uid, email, name, avatar }
 
   if (found.total > 0) {
     const doc = found.documents[0];
-    // update profil basic
+    // update profil basic, hanya update avatar jika belum ada
+    const updateData: any = { email, display_name: name, auth_provider: provider };
+    if (!doc.profile_image && avatar) updateData.profile_image = avatar;
     await db.updateDocument(
       process.env.APPWRITE_DATABASE_ID!, usersCollectionId, doc.$id,
-      { email, display_name: name, profile_image: avatar, auth_provider: provider }
+      updateData
     );
     return { userId: doc.user_id as string, docId: doc.$id as string, isNew: false };
   }

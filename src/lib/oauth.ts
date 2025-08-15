@@ -16,7 +16,14 @@ const STATE_COOKIE = "oauth_state";
 const VERIFIER_COOKIE = "oauth_verifier";
 
 export async function setOauthCookies(state: string, verifier?: string) {
-  const opts = { httpOnly: true, secure: true, sameSite: "lax" as const, path: "/", maxAge: 600 };
+  const opts = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: 600, // 10 menit
+  };
+  console.log('[OAUTH] setOauthCookies', { state, verifier, opts });
   const cookieStore = await cookies();
   cookieStore.set(STATE_COOKIE, state, opts);
   if (verifier) cookieStore.set(VERIFIER_COOKIE, verifier, opts);
@@ -25,6 +32,7 @@ export async function readOauthCookies() {
   const cookieStore = await cookies();
   const state = cookieStore.get(STATE_COOKIE)?.value;
   const verifier = cookieStore.get(VERIFIER_COOKIE)?.value;
+  console.log('[OAUTH] readOauthCookies', { state, verifier });
   return { state, verifier };
 }
 export async function clearOauthCookies() {

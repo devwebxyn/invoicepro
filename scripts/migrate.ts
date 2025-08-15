@@ -1,7 +1,6 @@
 // scripts/migrate.ts
 import { config } from 'dotenv';
-config({ path: '.env.local', override: true }); // baca .env.local
-config(); // fallback ke .env jika ada
+config(); // hanya baca .env
 import { Client, Databases, Users, Storage, Permission, Role } from "node-appwrite";
 
 const {

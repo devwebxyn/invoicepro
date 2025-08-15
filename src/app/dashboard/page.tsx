@@ -21,7 +21,9 @@ export default async function Dashboard() {
         <div className="h-16 w-16 rounded-full bg-zinc-100 overflow-hidden">
           {profile?.profile_image ? (
             <img src={profile.profile_image} alt="avatar" className="h-full w-full object-cover" />
-          ) : null}
+          ) : (
+            <img src="/avatar-default.svg" alt="default avatar" className="h-full w-full object-cover" />
+          )}
         </div>
         <div>
           <h1 className="text-2xl font-semibold">Halo, {profile?.display_name || sess.name || "User"} 👋</h1>
