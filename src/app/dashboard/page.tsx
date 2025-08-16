@@ -1,9 +1,14 @@
+// src/app/dashboard/page.tsx
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { appwriteServer } from "@/lib/appwrite";
 import { Query } from "node-appwrite";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Settings, DollarSign, FileText, PlusCircle } from "lucide-react";
 
-export default async function Dashboard() {
+export default async function DashboardPage() {
   const sess = await getSession();
   if (!sess) redirect("/masuk");
 
@@ -13,49 +18,72 @@ export default async function Dashboard() {
     process.env.APPWRITE_USERS_COLLECTION_ID!,
     [Query.equal("user_id", sess.sub)]
   );
-  const profile = list.total ? list.documents[0] as any : null;
+  const profile = list.total ? (list.documents[0] as any) : null;
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      <div className="flex items-center gap-4">
-        <div className="h-16 w-16 rounded-full bg-zinc-100 overflow-hidden">
-          {profile?.profile_image ? (
-            <img src={profile.profile_image} alt="avatar" className="h-full w-full object-cover" />
-          ) : (
-            <img src="/avatar-default.svg" alt="default avatar" className="h-full w-full object-cover" />
-          )}
-        </div>
+    <div className="space-y-6">
+      {/* Header Halaman */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Halo, {profile?.display_name || sess.name || "User"} 👋</h1>
-          <p className="text-sm text-zinc-600">
-            @{profile?.username || "belum-set"} • {profile?.auth_provider || sess.provider}
+          <h1 className="text-2xl font-semibold">
+            Halo, {profile?.display_name || sess.name || "User"} 👋
+          </h1>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Selamat datang kembali di dashboard Anda.
           </p>
         </div>
-        <form action="/api/auth/signout" method="post" className="ml-auto">
-          <button className="h-10 px-4 rounded-xl border">Sign out</button>
-        </form>
+        <Button asChild>
+          <Link href="/dashboard/invoices/new">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Buat Invoice Baru
+          </Link>
+        </Button>
       </div>
 
-      <section className="mt-8 grid md:grid-cols-3 gap-4">
-        <div className="card-2d p-5">
-          <div className="text-sm text-zinc-500">Alasan bergabung</div>
-          <div className="mt-2 font-medium">{profile?.reason || "-"}</div>
-        </div>
-        <div className="card-2d p-5">
-          <div className="text-sm text-zinc-500">Rating</div>
-          <div className="mt-2 font-medium">{profile?.rating ?? "-"}/5</div>
-        </div>
-        <div className="card-2d p-5">
-          <div className="text-sm text-zinc-500">Email</div>
-          <div className="mt-2 font-medium">{profile?.email || sess.email}</div>
-        </div>
+      {/* Ringkasan Statistik */}
+      <section className="grid md:grid-cols-3 gap-6">
+        <Card className="card-2d">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-zinc-500" />
+              <p className="text-sm text-zinc-500">Pendapatan (Bulan Ini)</p>
+            </div>
+            <p className="mt-2 text-2xl font-semibold">Rp 0</p>
+          </CardContent>
+        </Card>
+        <Card className="card-2d">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-zinc-500" />
+              <p className="text-sm text-zinc-500">Invoice Terbayar</p>
+            </div>
+            <p className="mt-2 text-2xl font-semibold">0 / 0</p>
+          </CardContent>
+        </Card>
+        <Card className="card-2d">
+          <CardContent className="p-5">
+            <div className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-zinc-500" />
+              <p className="text-sm text-zinc-500">Akses Pengaturan</p>
+            </div>
+            <Button asChild variant="outline" className="mt-2 w-full">
+              <Link href="/dashboard/settings">
+                Buka Pengaturan Profil
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       </section>
 
-      <div className="mt-8">
-        <a href="/onboarding" className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border hover:bg-zinc-50">
-          Edit Profil
-        </a>
-      </div>
-    </main>
+      {/* Aktivitas/Invoice Terbaru */}
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="font-medium">Invoice Terbaru</h3>
+          <p className="text-sm text-zinc-500 mt-2 text-center py-8">
+            Belum ada invoice. Buat yang pertama sekarang!
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
