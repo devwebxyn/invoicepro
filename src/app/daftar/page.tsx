@@ -34,34 +34,7 @@ export default function RegisterPage() {
     s >= 60 ? { label: "Sedang", color: "bg-yellow-500" } :
     { label: "Lemah", color: "bg-red-500" };
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const name = String(fd.get("name") || "");
-    const email = String(fd.get("email") || "");
-    const password = String(fd.get("password") || "");
-    const confirm = String(fd.get("confirm") || "");
-    const agree = fd.get("agree") === "on";
-
-    if (!name || !email || !password || !confirm) {
-      setMsg({ type: "err", text: "Lengkapi semua field terlebih dahulu." });
-      return;
-    }
-    if (password !== confirm) {
-      setMsg({ type: "err", text: "Konfirmasi kata sandi tidak sama." });
-      return;
-    }
-    if (!agree) {
-      setMsg({ type: "err", text: "Harap setujui Kebijakan & Ketentuan." });
-      return;
-    }
-
-    // TODO: ganti ke Appwrite / endpoint kamu
-    // await signUp(name, email, password)
-    await new Promise((r) => setTimeout(r, 800));
-    setMsg({ type: "ok", text: "Akun berhasil dibuat. Silakan verifikasi email & masuk." });
-    // router.push("/masuk")
-  }
+  // ...existing code...
 
   return (
     <>
@@ -102,7 +75,46 @@ export default function RegisterPage() {
                   <Link href="/masuk" className="underline underline-offset-4">Masuk</Link>
                 </p>
 
-                <form onSubmit={onSubmit} className="mt-6 space-y-4">
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const name = String(fd.get("name") || "");
+                  const email = String(fd.get("email") || "");
+                  const password = String(fd.get("password") || "");
+                  const confirm = String(fd.get("confirm") || "");
+                  const agree = fd.get("agree") === "on";
+
+                  if (!name || !email || !password || !confirm) {
+                    setMsg({ type: "err", text: "Lengkapi semua field terlebih dahulu." });
+                    return;
+                  }
+                  if (password !== confirm) {
+                    setMsg({ type: "err", text: "Konfirmasi kata sandi tidak sama." });
+                    return;
+                  }
+                  if (!agree) {
+                    setMsg({ type: "err", text: "Harap setujui Kebijakan & Ketentuan." });
+                    return;
+                  }
+
+                  setMsg(null);
+                  try {
+                    const res = await fetch("/api/auth/register", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ name, email, password })
+                    });
+                    const data = await res.json();
+                    if (!res.ok || !data.ok) {
+                      throw new Error(data.message || "Gagal membuat akun");
+                    }
+                    setMsg({ type: "ok", text: "Akun berhasil dibuat. Cek email untuk OTP!" });
+                    // Redirect ke halaman OTP
+                    window.location.href = `/verifikasi-otp?uid=${data.userId}&email=${encodeURIComponent(email)}`;
+                  } catch (err: any) {
+                    setMsg({ type: "err", text: err.message || "Terjadi kesalahan." });
+                  }
+                }} className="mt-6 space-y-4">
                   <div className="grid md:grid-cols-2 gap-3">
                     <div>
                       <label className="text-sm">Nama lengkap</label>
@@ -206,13 +218,13 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="grid grid-cols-3 gap-3">
-  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/google/start")}>
+  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/google/start")}> 
     <span className="inline-flex items-center gap-2 text-sm"><GoogleIcon /> Google</span>
   </Button>
-  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/facebook/start")}>
+  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/facebook/start")}> 
     <span className="inline-flex items-center gap-2 text-sm"><FacebookIcon /> Facebook</span>
   </Button>
-  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/twitter/start")}>
+  <Button type="button" variant="outline" className="h-11" onClick={() => (location.href = "/api/oauth/twitter/start")}> 
     <span className="inline-flex items-center gap-2 text-sm"><XIcon />Twitter</span>
   </Button>
 </div>

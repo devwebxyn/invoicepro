@@ -31,7 +31,8 @@ export default function LoginPage() {
     // await signIn(email, password)
     await new Promise((r) => setTimeout(r, 700));
     setMsg({ type: "ok", text: "Login sukses. Mengarahkan ke dashboard..." });
-    // router.push("/dashboard")
+    // Redirect to dashboard after successful login
+    window.location.href = "/dashboard";
   }
 
   return (

@@ -7,7 +7,7 @@ export async function GET() {
   const verifier = randomString(64);
   const challenge = sha256(verifier);
 
-  setOauthCookies(state, verifier);
+  await setOauthCookies(state, verifier);
 
   const params = new URLSearchParams({
     response_type: "code",
@@ -19,5 +19,6 @@ export async function GET() {
     code_challenge_method: "S256",
   });
 
-  return NextResponse.redirect(`https://twitter.com/i/oauth2/authorize?${params.toString()}`);
+  const res = NextResponse.redirect(`https://twitter.com/i/oauth2/authorize?${params.toString()}`);
+  return res;
 }

@@ -1,7 +1,8 @@
+
 // scripts/migrate.ts
 import { config } from 'dotenv';
 config(); // hanya baca .env
-import { Client, Databases, Users, Storage, Permission, Role } from "node-appwrite";
+import { Client, Databases, Users, Storage, Permission, Role, IndexType } from "node-appwrite";
 
 const {
   APPWRITE_ENDPOINT,
@@ -14,6 +15,8 @@ const {
 
 
 async function main() {
+  // ...existing code...
+
   const required = [
     'APPWRITE_ENDPOINT',
     'APPWRITE_PROJECT',
@@ -42,6 +45,7 @@ async function main() {
     console.log("✓ Database created:", APPWRITE_DATABASE_ID);
   }
 
+
   // 2) Collection users
   try {
     await db.getCollection(APPWRITE_DATABASE_ID!, APPWRITE_USERS_COLLECTION_ID!);
@@ -49,6 +53,16 @@ async function main() {
   } catch {
     await db.createCollection(APPWRITE_DATABASE_ID!, APPWRITE_USERS_COLLECTION_ID!, "Users");
     console.log("✓ Collection created:", APPWRITE_USERS_COLLECTION_ID);
+  }
+
+  // 2b) Collection OTP
+  const { APPWRITE_OTP_COLLECTION_ID } = process.env;
+  try {
+    await db.getCollection(APPWRITE_DATABASE_ID!, APPWRITE_OTP_COLLECTION_ID!);
+    console.log("✓ Collection exists:", APPWRITE_OTP_COLLECTION_ID);
+  } catch {
+    await db.createCollection(APPWRITE_DATABASE_ID!, APPWRITE_OTP_COLLECTION_ID!, "User OTPs");
+    console.log("✓ Collection created:", APPWRITE_OTP_COLLECTION_ID);
   }
 
   // 3) Attributes (idempotent: bungkus try/catch)
@@ -77,6 +91,27 @@ async function main() {
   await addStr("auth_provider", 32, false);
   await addStr("provider_uid", 128, false);
 
+  // 3b) Attributes untuk OTP
+  const addStrOtp = async (key: string, size = 256, required = false) => {
+    try {
+      // @ts-ignore
+      await db.createStringAttribute(APPWRITE_DATABASE_ID!, APPWRITE_OTP_COLLECTION_ID!, key, size, required);
+      console.log("  + otp.", key);
+    } catch {}
+  };
+  const addBoolOtp = async (key: string, required = false) => {
+    try {
+      // @ts-ignore
+      await db.createBooleanAttribute(APPWRITE_DATABASE_ID!, APPWRITE_OTP_COLLECTION_ID!, key, required);
+      console.log("  + otp.", key);
+    } catch {}
+  };
+
+  await addStrOtp("user_id", 64, true);
+  await addStrOtp("otp_hash", 256, true);
+  await addStrOtp("expires_at", 64, true);
+  await addBoolOtp("verified", false);
+
   // 4) Indexes (unique utk username, provider_uid, user_id)
   const addIndex = async (key: string, fields: string[], unique = false) => {
     try {
@@ -86,10 +121,9 @@ async function main() {
         APPWRITE_DATABASE_ID!,
         APPWRITE_USERS_COLLECTION_ID!,
         key,
-        'key',
+        unique ? IndexType.Unique : IndexType.Key,
         fields,
-        orders,
-        unique ? { unique: true } : undefined
+        orders
       );
       console.log('  # index', key);
     } catch {}
@@ -97,6 +131,23 @@ async function main() {
   await addIndex("idx_user_id_unique", ["user_id"], true);
   await addIndex("idx_username_unique", ["username"], true);
   await addIndex("idx_provider_uid_unique", ["provider_uid"], true);
+
+  // 4b) Indexes OTP
+  const { IndexType } = require("node-appwrite");
+  const addIndexOtp = async (key: string, fields: string[], unique = false) => {
+    try {
+      // @ts-ignore
+      await db.createIndex(
+        APPWRITE_DATABASE_ID!,
+        APPWRITE_OTP_COLLECTION_ID!,
+        key,
+        unique ? IndexType.Unique : IndexType.Key,
+        fields
+      );
+      console.log("  # otp index", key);
+    } catch {}
+  };
+  await addIndexOtp("idx_user_id_unique", ["user_id"], true);
 
   // 5) Bucket (public read utk demo)
   try {
