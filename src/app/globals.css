@@ -1,3 +1,8 @@
+/* Sidebar width variable and content padding */
+:root { --sidebar-w: 280px; }
+@media (min-width: 768px) {
+  .with-sidebar { padding-left: var(--sidebar-w) !important; }
+}
 /* PNG logo khusus (misal OVO) agar tampil optimal di dark/light mode */
 .logo-png {
   background: transparent !important;

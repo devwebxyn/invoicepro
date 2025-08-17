@@ -16,7 +16,11 @@ export default function DashboardHeader() {
             <Menu className="h-4 w-4" />
           </Button>
         </SheetTrigger>
-  <SheetContent className="p-0">
+  <SheetContent className="p-0"> 
+<SheetContent className="p-0 w-80 sm:w-96">
+  <DashboardSidebar isMobile />
+</SheetContent>
+
           <DashboardSidebar isMobile />
         </SheetContent>
       </Sheet>
