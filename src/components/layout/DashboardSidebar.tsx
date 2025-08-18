@@ -16,6 +16,7 @@ type Item = {
 
 const NAV: Item[] = [
   { href: "/dashboard", label: "Beranda", icon: Home, match: "exact" },
+  { href: "/dashboard/plan", label: "Your Plan", icon: Sparkles, match: "exact" },
   { href: "/dashboard/settings", label: "Pengaturan", icon: Settings, match: "startsWith", aliases: ["/settings"] },
 ];
 
@@ -77,7 +78,8 @@ export default function DashboardSidebar({ isMobile = false }: { isMobile?: bool
 
         {/* nav */}
         <nav className="mt-3 flex-1 space-y-1 overflow-y-auto">
-          {NAV.map((item) => {
+          {/* Main nav items except Your Plan */}
+          {NAV.filter((item) => item.label !== "Your Plan").map((item) => {
             const active = isActive(pathname, item);
             const Icon = item.icon;
             return (
@@ -106,6 +108,49 @@ export default function DashboardSidebar({ isMobile = false }: { isMobile?: bool
               </Link>
             );
           })}
+
+          {/* Dropdown for Your Plan with two links */}
+          <div className="mx-2">
+            <div
+              className={cn(
+                "group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition cursor-pointer",
+                "text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white",
+                "hover:bg-white/40 dark:hover:bg-white/5",
+                (pathname.startsWith("/dashboard/plan")) && "bg-white/60 dark:bg-white/10 shadow-[0_2px_14px_-6px_rgba(99,102,241,.45)]"
+              )}
+            >
+              <Sparkles className="h-5 w-5 shrink-0" />
+              <span className="truncate text-sm font-medium">Your Plan</span>
+            </div>
+            {/* Dropdown content */}
+            <div className="ml-8 mt-1 space-y-1">
+              <Link
+                href="/dashboard/plan"
+                aria-current={pathname === "/dashboard/plan" ? "page" : undefined}
+                className={cn(
+                  "group flex items-center gap-2 rounded-xl px-2 py-2 text-sm font-normal transition",
+                  "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white",
+                  "hover:bg-white/40 dark:hover:bg-white/5",
+                  pathname === "/dashboard/plan" && "bg-white/60 dark:bg-white/10 shadow"
+                )}
+              >
+                <span>Your Plan</span>
+              </Link>
+              <Link
+                href="/dashboard/plan/manage"
+                aria-current={pathname === "/dashboard/plan/manage" ? "page" : undefined}
+                className={cn(
+                  "group flex items-center gap-2 rounded-xl px-2 py-2 text-sm font-normal transition",
+                  "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white",
+                  "hover:bg-white/40 dark:hover:bg-white/5",
+                  pathname === "/dashboard/plan/manage" && "bg-white/60 dark:bg-white/10 shadow"
+                )}
+              >
+                <span>Manage Your Plan</span>
+              </Link>
+            </div>
+          </div>
+
         </nav>
 
         {/* user area */}

@@ -1,3 +1,5 @@
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 // src/app/dashboard/page.tsx
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -25,12 +27,24 @@ export default async function DashboardPage() {
       {/* Header Halaman */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">
-            Halo, {profile?.display_name || sess.name || "User"} 👋
-          </h1>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Selamat datang kembali di dashboard Anda.
-          </p>
+          <h1 className="text-2xl font-semibold">Halo, {profile?.display_name || sess.name || "User"} 👋</h1>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="rounded-full px-2.5 py-1 text-xs font-medium bg-zinc-900 text-white dark:bg-white dark:text-zinc-900">
+              {(profile?.plan ?? "free").toUpperCase()}
+            </span>
+
+            {(!profile?.plan || profile?.plan === "free") && (
+              <a href="/dashboard/plan" className="text-sm underline underline-offset-4 hover:opacity-80">
+                Upgrade ke Pro / Business
+              </a>
+            )}
+
+            {profile?.plan === "pro" && (
+              <a href="/dashboard/plan?target=business" className="text-sm underline underline-offset-4 hover:opacity-80">
+                Upgrade ke Business
+              </a>
+            )}
+          </div>
         </div>
         <Button asChild>
           <Link href="/dashboard/invoices/new">

@@ -23,7 +23,12 @@ export async function upsertUser({ provider, provider_uid, email, name, avatar }
   if (found.total > 0) {
     const doc = found.documents[0];
     // update profil basic, hanya update avatar jika belum ada
-    const updateData: any = { email, display_name: name, auth_provider: provider };
+    const updateData: any = {
+      email,
+      display_name: name,
+      auth_provider: provider,
+      plan: doc.plan ?? "free", // ensure plan always present
+    };
     if (!doc.profile_image && avatar) updateData.profile_image = avatar;
     await db.updateDocument(
       process.env.APPWRITE_DATABASE_ID!, usersCollectionId, doc.$id,
@@ -51,6 +56,7 @@ export async function upsertUser({ provider, provider_uid, email, name, avatar }
       provider_uid,
       email,
       display_name: name,
+      plan: "free", // always set default plan
     }
   );
 
